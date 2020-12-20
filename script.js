@@ -12,20 +12,16 @@ retrieveBtn.addEventListener("click", function (evt) {
   evt.preventDefault();
   queryString = document.querySelector("#query-string").value;
   if (queryString) {
+    //reset datasets on pagination buttons in case this is not first search
+    resetPaginationBtns();
     //displays MAX_HITS hits when clicking retrieve btn - in this case, has to always be default MAX_HITS value
     retrieveRecipe(queryString, 0, MAX_HITS);
   } // prevent request from sending if input is empty
   else {
     makeErrorMessage();
+    hideBtnsOnError();
   }
 });
-
-function getFromAndTo() {
-  return [
-    document.querySelector("#previous-page").dataset.from,
-    document.querySelector("#next-page").dataset.to,
-  ];
-}
 
 function makeErrorMessage() {
   const inputRequired = document.createElement("div");
@@ -78,6 +74,7 @@ async function retrieveRecipe(queryString, from, to, goingBack) {
         //if filtering reveals no high vit D matches for given search-term
         else {
           makeErrorSection(false);
+          hideBtnsOnError();
         }
       }
     })
@@ -175,7 +172,7 @@ function makeRecipeRow() {
 function makeImgCol(recipe) {
   const imageCol = document.createElement("div");
   addStandardClassesToCol(imageCol);
-  imageCol.classList.add("image-col");
+  imageCol.classList.add("image-col", "text-center");
   const image = document.createElement("img");
   image.setAttribute("src", recipe.recipe.image);
   image.setAttribute("alt", "recipe image");
@@ -187,7 +184,7 @@ function makeImgCol(recipe) {
 }
 
 function addStandardClassesToCol(col) {
-  col.classList.add("col-md-3", "px-3", "py-3", "mx-3", "my-3", "shadow");
+  col.classList.add("col-lg-3", "px-3", "py-3", "mx-3", "my-3", "shadow");
 }
 
 function makeLink(url, imageCol) {
@@ -217,9 +214,9 @@ function makeIngredientsCol(recipe) {
 }
 
 function makeRecipeTitle(label) {
-  const recipeTitle = document.createElement("h3");
-  //if I use create element i and set inner text of h2 to label, it overwrites icon. so I'll use innerHTML although aware approach not ideal
-  recipeTitle.innerHTML = `<i class='ph-fork-knife ph-xl'></i>${label}`;
+  const recipeTitle = document.createElement("h4");
+  //if I use create element i and set inner text of h4 to label, it overwrites icon. so I'll use innerHTML although aware approach not ideal
+  recipeTitle.innerHTML = `<i class='ph-fork-knife ph-xl'></i> ${label}`;
   recipeTitle.classList.add("text-center");
   return recipeTitle;
 }
@@ -261,9 +258,9 @@ function makeVitaminCol(recipe) {
 }
 
 function makeVitHeader(vitaminCol) {
-  const vitHeader = document.createElement("h3");
+  const vitHeader = document.createElement("h4");
   vitHeader.innerHTML = `<i class="ph-first-aid ph-xl"></i> Nutrient content`;
-  vitHeader.classList.add("text-center");
+  vitHeader.classList.add("text-center", "mb-3");
   const perPersonI = document.createElement("i");
   perPersonI.innerText = "Per person";
   vitaminCol.append(vitHeader);
@@ -349,7 +346,7 @@ function toggleBtnVisibility() {
   let previousBtn = document.querySelector("#previous-page");
   let nextBtn = document.querySelector("#next-page");
   //if FROM is 20, leave prevBtn disabled. if not, make visible
-  if (Number(previousBtn.dataset.from) === 20) {
+  if (Number(previousBtn.dataset.from) === MAX_HITS) {
     previousBtn.setAttribute("disabled", "disabled");
   } else {
     previousBtn.removeAttribute("disabled");
@@ -358,4 +355,16 @@ function toggleBtnVisibility() {
   if (nextBtn.hasAttribute("disabled")) {
     nextBtn.removeAttribute("disabled");
   }
+}
+
+function hideBtnsOnError() {
+  let previousBtn = document.querySelector("#previous-page");
+  let nextBtn = document.querySelector("#next-page");
+  previousBtn.setAttribute("disabled", "disabled");
+  nextBtn.setAttribute("disabled", "disabled");
+}
+
+function resetPaginationBtns() {
+  document.querySelector("#previous-page").dataset.from = 0;
+  document.querySelector("#next-page").dataset.to = MAX_HITS;
 }
