@@ -1,4 +1,4 @@
-#VITAMIN D RECIPE GENERATOR
+# VITAMIN D RECIPE GENERATOR
 
 ### :leafy_green: Recipe retrieval of high vitamin-D foods based on search-term
 
@@ -21,7 +21,7 @@ Track is a small personal project, intended for practice only.
 5. Error handling
 6. Pagination
 
-#SCREENSHOTS
+# SCREENSHOTS
 
 ![screenshot of match](./imgs/search.png)
 ![screenshot of no match](./imgs/no-match.png)
