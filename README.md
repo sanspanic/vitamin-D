@@ -2,7 +2,7 @@
 
 ### :leafy_green: Recipe retrieval of high vitamin-D foods based on search-term
 
-Track is a small personal project, intended for practice only.
+This is a small personal project, intended for practice only.
 
 ### :lemon: Features: 
 
