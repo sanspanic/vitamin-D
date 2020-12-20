@@ -3,6 +3,7 @@ console.log("connected");
 const mainCont = document.querySelector(".main-container");
 const retrieveBtn = document.querySelector("#retrieve-btn");
 const formP = document.querySelector("#form-p");
+const MIN_CONTENT = 10;
 
 retrieveBtn.addEventListener("click", function (evt) {
   evt.preventDefault();
@@ -108,7 +109,8 @@ function makeErrorCol(msg, errorRow) {
 function filterHighD(hits) {
   const highDArr = hits.filter(
     //adjust per person
-    (hit) => hit.recipe.totalDaily.VITD.quantity / hit.recipe.yield >= 20
+    (hit) =>
+      hit.recipe.totalDaily.VITD.quantity / hit.recipe.yield >= MIN_CONTENT
   );
   return highDArr;
 }
