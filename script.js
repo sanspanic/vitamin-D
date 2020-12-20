@@ -6,23 +6,26 @@ const formP = document.querySelector("#form-p");
 const MIN_CONTENT = 10;
 const MAX_HITS = 20;
 //numbers will be bound to pagination arrows. 20 hits max
-let FROM;
-let TO;
 let queryString;
 
 retrieveBtn.addEventListener("click", function (evt) {
   evt.preventDefault();
   queryString = document.querySelector("#query-string").value;
   if (queryString) {
-    //displays MAX_HITS hits when clicking retrieve btn
-    FROM = document.querySelector("#previous-page").dataset.from;
-    TO = document.querySelector("#next-page").dataset.to;
-    retrieveRecipe(queryString, FROM, TO);
+    //displays MAX_HITS hits when clicking retrieve btn - in this case, has to always be default MAX_HITS value
+    retrieveRecipe(queryString, 0, MAX_HITS);
   } // prevent request from sending if input is empty
   else {
     makeErrorMessage();
   }
 });
+
+function getFromAndTo() {
+  return [
+    document.querySelector("#previous-page").dataset.from,
+    document.querySelector("#next-page").dataset.to,
+  ];
+}
 
 function makeErrorMessage() {
   const inputRequired = document.createElement("div");
@@ -36,7 +39,7 @@ function removeErrorMessage() {
   document.querySelector(".alert").remove();
 }
 
-async function retrieveRecipe(queryString, FROM, TO) {
+async function retrieveRecipe(queryString, from, to, goingBack) {
   await axios
     .get("https://api.edamam.com/search", {
       params: {
@@ -44,8 +47,8 @@ async function retrieveRecipe(queryString, FROM, TO) {
         app_key: APP_KEY,
         q: queryString,
         yield: 2,
-        from: FROM,
-        to: TO,
+        from: from,
+        to: to,
       },
     })
     .then(function (response) {
@@ -53,16 +56,27 @@ async function retrieveRecipe(queryString, FROM, TO) {
       //if user enters search term that has no matches:
       if (response.data.hits.length === 0) {
         makeErrorSection(true);
-      } else {
+      } //database has matches for given search term
+      else {
+        //filter high vit D matches
         const relevantRecipes = filterHighD(response.data.hits);
         console.log(relevantRecipes);
+        //if filtering reveals matches
         if (relevantRecipes.length >= 1) {
           //empty potential error messages or other recipes
           mainCont.innerText = "";
           relevantRecipes.forEach((recipe) => makeRecipeSection(recipe));
-          incrementPageBtnsData();
-        } else {
-          //no high vit D matches for given search-term
+          if (!goingBack) {
+            //pagination, going forward
+            incrementPageBtnsData();
+          } //pagination, going backwards
+          else {
+            decrementPageBtnsData();
+          }
+          toggleBtnVisibility();
+        }
+        //if filtering reveals no high vit D matches for given search-term
+        else {
           makeErrorSection(false);
         }
       }
@@ -297,13 +311,6 @@ function appendAll(
 function incrementPageBtnsData() {
   let previousBtn = document.querySelector("#previous-page");
   let nextBtn = document.querySelector("#next-page");
-  //below will only run the first time recipes are loaded - makes buttons appear
-  if (previousBtn.getAttribute("disabled") === "disabled") {
-    previousBtn.removeAttribute("disabled");
-  }
-  if (nextBtn.getAttribute("disabled") === "disabled") {
-    nextBtn.removeAttribute("disabled");
-  }
   //below will update data (FROM, TO) that next call will use. conversion to Num needed otherwise adds strings
   previousBtn.dataset.from = Number(previousBtn.dataset.from) + MAX_HITS;
   nextBtn.dataset.to = Number(nextBtn.dataset.to) + MAX_HITS;
@@ -319,21 +326,36 @@ function decrementPageBtnsData() {
 
 const pageBtnsSection = document.querySelector(".page-buttons");
 pageBtnsSection.addEventListener("click", function (evt) {
+  let from = document.querySelector("#previous-page").dataset.from;
+  let to = document.querySelector("#next-page").dataset.to;
   //if click on next page button
   if (
     evt.target.id === "next-page" ||
     evt.target.parentElement.id === "next-page"
   ) {
-    FROM = document.querySelector("#previous-page").dataset.from;
-    TO = document.querySelector("#next-page").dataset.to;
-    retrieveRecipe(queryString, FROM, TO);
-    incrementPageBtnsData();
+    retrieveRecipe(queryString, from, to);
   } //if click on the previous button
   else if (
     evt.target.id === "previous-page" ||
     evt.target.parentElement.id === "previous-page"
   ) {
-    decrementPageBtnsData();
-    retrieveRecipe(queryString, FROM - MAX_HITS, TO - MAX_HITS);
+    //previous page means subtracting 2*MAX_HITS from from and to. bc from and to are next page's hit range
+    retrieveRecipe(queryString, from - 2 * MAX_HITS, to - 2 * MAX_HITS, true);
   }
 });
+
+//make sure next button always renders and previous button only renders if from > 0
+function toggleBtnVisibility() {
+  let previousBtn = document.querySelector("#previous-page");
+  let nextBtn = document.querySelector("#next-page");
+  //if FROM is 20, leave prevBtn disabled. if not, make visible
+  if (Number(previousBtn.dataset.from) === 20) {
+    previousBtn.setAttribute("disabled", "disabled");
+  } else {
+    previousBtn.removeAttribute("disabled");
+  }
+  // if nextBtn is disabled, enable
+  if (nextBtn.hasAttribute("disabled")) {
+    nextBtn.removeAttribute("disabled");
+  }
+}
