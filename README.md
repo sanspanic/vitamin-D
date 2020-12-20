@@ -23,8 +23,8 @@ This is a small personal project, intended for practice only.
 
 # SCREENSHOTS
 
-![screenshot of match](./imgs/search.png)
-![screenshot of no match](./imgs/no-match.png)
+![screenshot of match](./imgs/banana.png)
+![screenshot of no match](./imgs/no_match.png)
 
 # Credits 
 
