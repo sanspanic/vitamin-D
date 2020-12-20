@@ -55,3 +55,26 @@ body {
 footer {
   background-color: #bdd39f;
 }
+
+/* change blue outline to green */
+textarea:hover,
+input:hover,
+textarea:active,
+input:active,
+textarea:focus,
+input:focus,
+button:focus,
+button:active,
+button:hover,
+label:focus,
+.btn:active,
+.btn.active {
+  outline: none !important;
+  -webkit-appearance: none;
+  box-shadow: 0 0 0 3px rgba(86, 161, 73, 0.5) !important;
+}
+
+.btn-primary:hover {
+  background-color: rgb(115, 230, 95);
+  border: 1px solid rgb(115, 230, 95);
+}

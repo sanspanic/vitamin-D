@@ -25,7 +25,7 @@
       <nav class="navbar navbar-expand-lg navbar-dark">
         <a class="navbar-brand" href="#"> <img src="./imgs/favicon.ico" alt=""> Vitamin D Recipe Generator</a>
       </nav>
-      <main role="main">
+      <main role="main" class='flex-fill'>
         <!-- Main jumbotron for a primary marketing message or call to action -->
         <div class="jumbotron">
           <div id="title-container" class="container py-3 px-3 shadow">
@@ -34,80 +34,23 @@
               Get recipes with plenty of Vitamin D.
             </p>
             <p>
-              <btn
+              <form class='form-inline' action="">
+                <input class='form-control mr-3' type="text">
+                <btn
                 id="retrieve-btn"
                 class="btn btn-primary btn-lg"
                 href="#"
                 role="button"
                 >Retrieve recipe &raquo;</btn
               >
+            </form>
+
             </p>
           </div>
         </div>
 
         <div class="container main-container">
-          <!-- Example component -->
-          <div class="container recipe-container px-3 py-3 mt-5 shadow">
-            <div class="row justify-content-around">
-              <div class="col-md-3 image-col px-3 py-3 mx-3 shadow">
-                <img id='recipe-img'
-                  src="https://images.unsplash.com/photo-1518779578993-ec3579fee39f?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=975&q=80"
-                  alt="recipe"
-                  class="img-fluid"
-                />
-              </div>
-              <div class="col-md-3 py-3 px-3 mx-3 ingredients-col shadow">
-                <h2 id='recipe-title'><i class="ph-fork-knife ph-xl"></i> Recipe Title</h2>
-                  <i>Ingredients:</i>
-                  <ul>
-                    <li>Onions</li>
-                    <li>Chicken</li>
-                    <li>Butter</li>
-                    <li>Garlic</li>
-                  </ul>
-                  <a href="">Full recipe</a>
-                <p id='vitD-p'></p>
-              </div>
-              <div class="col-md-3 px-3 py-3 mx-3 vitamin-col shadow">
-                <h4><i class="ph-sun ph-xl"></i> Vitamin D Content</h4>
-                  <p>Percentage of daily recommended intake: 20.00%</p>
-                <h4><i class="fas fa-bone"></i> Calcium Content</h4>
-                  <p>Percentage of daily recommended intake: 20.00%</p>
-                <p id='vitD-p'></p>
-              </div>
-            </div>
-        </div>
-        <!-- second recipe -->
-        <div class="container recipe-container px-3 py-3 mt-5 shadow">
-          <div class="row justify-content-around">
-            <div class="col-md-3 image-col px-3 py-3 mx-3 shadow">
-              <img id='recipe-img'
-                src="https://images.unsplash.com/photo-1518779578993-ec3579fee39f?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=975&q=80"
-                alt="recipe"
-                class="img-fluid"
-              />
-            </div>
-            <div class="col-md-3 py-3 px-3 mx-3 ingredients-col shadow">
-              <h2 id='recipe-title'><i class="ph-fork-knife ph-xl"></i> Recipe Title</h2>
-                <i>Ingredients:</i>
-                <ul>
-                  <li>Onions</li>
-                  <li>Chicken</li>
-                  <li>Butter</li>
-                  <li>Garlic</li>
-                </ul>
-                <a href="">Full recipe</a>
-              <p id='vitD-p'></p>
-            </div>
-            <div class="col-md-3 px-3 py-3 mx-3 vitamin-col shadow">
-              <h4><i class="ph-sun ph-xl"></i> Vitamin D Content</h4>
-                <p>Percentage of daily recommended intake: 20.00%</p>
-              <h4><i class="fas fa-bone"></i> Calcium Content</h4>
-                <p>Percentage of daily recommended intake: 20.00%</p>
-              <p id='vitD-p'></p>
-            </div>
-          </div>
-      </div>
+          <!-- JS will append recipe sections here -->
         </div>
         <!-- /container -->
       </main>
