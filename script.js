@@ -2,18 +2,38 @@ console.log("connected");
 
 const mainCont = document.querySelector(".main-container");
 const retrieveBtn = document.querySelector("#retrieve-btn");
+const formP = document.querySelector("#form-p");
 
-retrieveBtn.addEventListener("click", function () {
-  retrieveRecipe();
+retrieveBtn.addEventListener("click", function (evt) {
+  evt.preventDefault();
+  const queryString = document.querySelector("#query-string").value;
+  if (queryString) {
+    retrieveRecipe(queryString);
+  } // prevent request from sending if input is empty
+  else {
+    makeErrorMessage();
+  }
 });
 
-async function retrieveRecipe() {
+function makeErrorMessage() {
+  const inputRequired = document.createElement("div");
+  inputRequired.innerHTML = `<i class="ph-warning-octagon ph-xl"></i> Please enter a search-term first.`;
+  inputRequired.classList.add("error-input-required", "alert", "alert-danger");
+  formP.append(inputRequired);
+  setTimeout(removeErrorMessage, 5000);
+}
+
+function removeErrorMessage() {
+  document.querySelector(".alert").remove();
+}
+
+async function retrieveRecipe(queryString) {
   await axios
     .get("https://api.edamam.com/search", {
       params: {
         app_id: APP_ID,
         app_key: APP_KEY,
-        q: "fish",
+        q: queryString,
         yield: 2,
         from: 0,
         to: 10,
@@ -21,9 +41,21 @@ async function retrieveRecipe() {
     })
     .then(function (response) {
       // handle success
-      const relevantRecipes = filterHighD(response.data.hits);
-      console.log(relevantRecipes);
-      relevantRecipes.forEach((recipe) => makeRecipeSection(recipe));
+      //if user enters search term that has no matches:
+      if (response.data.hits.length === 0) {
+        makeErrorSection(true);
+      } else {
+        const relevantRecipes = filterHighD(response.data.hits);
+        console.log(relevantRecipes);
+        if (relevantRecipes.length >= 1) {
+          //empty potential error messages or other recipes
+          mainCont.innerText = "";
+          relevantRecipes.forEach((recipe) => makeRecipeSection(recipe));
+        } else {
+          //no high vit D matches for given search-term
+          makeErrorSection(false);
+        }
+      }
     })
     .catch(function (error) {
       if (error.response) {
@@ -43,6 +75,34 @@ async function retrieveRecipe() {
       }
       console.log(error.config);
     });
+}
+
+//true if search term is misspelled and there re no matches in whole DB. false if no matches with high vit D content.
+function makeErrorSection(searchTermIsWrong) {
+  mainCont.innerText = "";
+  const errorDivMain = makeRecipeDiv();
+  const errorRowMain = makeRecipeRow();
+  if (searchTermIsWrong) {
+    makeErrorCol(
+      "Oops! The term you have entered has no matches in our database. Please try again.",
+      errorRowMain
+    );
+  } else {
+    makeErrorCol(
+      "Oops! We don't have any recipes that match your search term and are high in vitamin D content. Try something else! Perhaps enter some of <a href='https://www.webmd.com/food-recipes/guide/calcium-vitamin-d-foods'>these?</a>",
+      errorRowMain
+    );
+  }
+  errorDivMain.append(errorRowMain);
+  mainCont.append(errorDivMain);
+}
+
+function makeErrorCol(msg, errorRow) {
+  const errorCol = document.createElement("div");
+  addStandardClassesToCol(errorCol);
+  errorCol.classList.add("error-col");
+  errorCol.innerHTML = `<i class="ph-warning-octagon ph-xl"></i> ${msg}`;
+  errorRow.append(errorCol);
 }
 
 function filterHighD(hits) {

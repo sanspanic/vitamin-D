@@ -52,6 +52,11 @@ body {
   border-radius: 20px;
 }
 
+.error-col {
+  background-color: rgba(255, 227, 34, 0.8);
+  border-radius: 20px;
+}
+
 footer {
   background-color: #bdd39f;
 }
@@ -77,4 +82,10 @@ label:focus,
 .btn-primary:hover {
   background-color: rgb(115, 230, 95);
   border: 1px solid rgb(115, 230, 95);
+}
+
+.alert-danger {
+  background-color: rgba(255, 227, 34, 0.8);
+  border: 1px solid rgba(255, 227, 34, 0.8);
+  color: #56a149;
 }
