@@ -4,12 +4,20 @@ const mainCont = document.querySelector(".main-container");
 const retrieveBtn = document.querySelector("#retrieve-btn");
 const formP = document.querySelector("#form-p");
 const MIN_CONTENT = 10;
+const MAX_HITS = 20;
+//numbers will be bound to pagination arrows. 20 hits max
+let FROM;
+let TO;
+let queryString;
 
 retrieveBtn.addEventListener("click", function (evt) {
   evt.preventDefault();
-  const queryString = document.querySelector("#query-string").value;
+  queryString = document.querySelector("#query-string").value;
   if (queryString) {
-    retrieveRecipe(queryString);
+    //displays MAX_HITS hits when clicking retrieve btn
+    FROM = document.querySelector("#previous-page").dataset.from;
+    TO = document.querySelector("#next-page").dataset.to;
+    retrieveRecipe(queryString, FROM, TO);
   } // prevent request from sending if input is empty
   else {
     makeErrorMessage();
@@ -28,7 +36,7 @@ function removeErrorMessage() {
   document.querySelector(".alert").remove();
 }
 
-async function retrieveRecipe(queryString) {
+async function retrieveRecipe(queryString, FROM, TO) {
   await axios
     .get("https://api.edamam.com/search", {
       params: {
@@ -36,8 +44,8 @@ async function retrieveRecipe(queryString) {
         app_key: APP_KEY,
         q: queryString,
         yield: 2,
-        from: 0,
-        to: 10,
+        from: FROM,
+        to: TO,
       },
     })
     .then(function (response) {
@@ -52,6 +60,7 @@ async function retrieveRecipe(queryString) {
           //empty potential error messages or other recipes
           mainCont.innerText = "";
           relevantRecipes.forEach((recipe) => makeRecipeSection(recipe));
+          incrementPageBtnsData();
         } else {
           //no high vit D matches for given search-term
           makeErrorSection(false);
@@ -238,7 +247,6 @@ function makeVitaminCol(recipe) {
 }
 
 function makeVitHeader(vitaminCol) {
-  //debugger;
   const vitHeader = document.createElement("h3");
   vitHeader.innerHTML = `<i class="ph-first-aid ph-xl"></i> Nutrient content`;
   vitHeader.classList.add("text-center");
@@ -285,3 +293,47 @@ function appendAll(
   recipeRowMain.append(ingredientsColMain);
   recipeRowMain.append(vitaminColMain);
 }
+
+function incrementPageBtnsData() {
+  let previousBtn = document.querySelector("#previous-page");
+  let nextBtn = document.querySelector("#next-page");
+  //below will only run the first time recipes are loaded - makes buttons appear
+  if (previousBtn.getAttribute("disabled") === "disabled") {
+    previousBtn.removeAttribute("disabled");
+  }
+  if (nextBtn.getAttribute("disabled") === "disabled") {
+    nextBtn.removeAttribute("disabled");
+  }
+  //below will update data (FROM, TO) that next call will use. conversion to Num needed otherwise adds strings
+  previousBtn.dataset.from = Number(previousBtn.dataset.from) + MAX_HITS;
+  nextBtn.dataset.to = Number(nextBtn.dataset.to) + MAX_HITS;
+}
+
+function decrementPageBtnsData() {
+  let previousBtn = document.querySelector("#previous-page");
+  let nextBtn = document.querySelector("#next-page");
+  //below will update data (FROM, TO) that next call will use. conversion to Num needed otherwise adds strings
+  previousBtn.dataset.from = Number(previousBtn.dataset.from) - MAX_HITS;
+  nextBtn.dataset.to = Number(nextBtn.dataset.to) - MAX_HITS;
+}
+
+const pageBtnsSection = document.querySelector(".page-buttons");
+pageBtnsSection.addEventListener("click", function (evt) {
+  //if click on next page button
+  if (
+    evt.target.id === "next-page" ||
+    evt.target.parentElement.id === "next-page"
+  ) {
+    FROM = document.querySelector("#previous-page").dataset.from;
+    TO = document.querySelector("#next-page").dataset.to;
+    retrieveRecipe(queryString, FROM, TO);
+    incrementPageBtnsData();
+  } //if click on the previous button
+  else if (
+    evt.target.id === "previous-page" ||
+    evt.target.parentElement.id === "previous-page"
+  ) {
+    decrementPageBtnsData();
+    retrieveRecipe(queryString, FROM - MAX_HITS, TO - MAX_HITS);
+  }
+});
